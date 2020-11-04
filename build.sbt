@@ -12,7 +12,8 @@ scalaVersion := "2.13.3"
 
 val catsCoreVersion = "2.2.0"
 val catsEffectsVersion = "2.2.0"
-val catsScalacheck = "0.3.0"
+val catsScalacheckVersion = "0.3.0"
+val console4catsVersion = "0.8.1"
 val newtypeVersion = "0.4.4"
 val refinedVersion = "0.9.17"
 val squantsVersion = "1.7.0"
@@ -23,7 +24,8 @@ libraryDependencies ++= Seq(
   compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1" cross CrossVersion.binary),
   "org.typelevel" %% "cats-core" % catsCoreVersion,
   "org.typelevel" %% "cats-effect" % catsEffectsVersion,
-  "io.chrisdavenport" %% "cats-scalacheck" % catsScalacheck % Test,
+  "io.chrisdavenport" %% "cats-scalacheck" % catsScalacheckVersion % Test,
+  "dev.profunktor" %% "console4cats" % console4catsVersion,
   "io.estatico" %% "newtype" % newtypeVersion,
   "eu.timepit" %% "refined-cats" % refinedVersion,
   "eu.timepit" %% "refined-scalacheck" % refinedVersion % Test,
