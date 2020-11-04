@@ -11,5 +11,5 @@ final class SocialNetworkContext(timeMarker: TimeMarker[IO], timelines: Timeline
 }
 
 object SocialNetworkContext {
-  def impl = new SocialNetworkContext(TimeMarker.impl[IO], ???)
+  def impl: SocialNetworkContext = new SocialNetworkContext(TimeMarker.impl[IO], ???)
 }
