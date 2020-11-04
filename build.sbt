@@ -14,6 +14,8 @@ val catsCoreVersion = "2.2.0"
 val catsEffectsVersion = "2.2.0"
 val catsScalacheckVersion = "0.3.0"
 val console4catsVersion = "0.8.1"
+val log4catsVersion = "1.1.1"
+val log4jVersion = "2.13.3"
 val newtypeVersion = "0.4.4"
 val refinedVersion = "0.9.17"
 val squantsVersion = "1.7.0"
@@ -26,6 +28,10 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-effect" % catsEffectsVersion,
   "io.chrisdavenport" %% "cats-scalacheck" % catsScalacheckVersion % Test,
   "dev.profunktor" %% "console4cats" % console4catsVersion,
+  "io.chrisdavenport" %% "log4cats-core" % log4catsVersion,
+  "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4jVersion,
+  "io.chrisdavenport" %% "log4cats-slf4j" % log4catsVersion,
   "io.estatico" %% "newtype" % newtypeVersion,
   "eu.timepit" %% "refined-cats" % refinedVersion,
   "eu.timepit" %% "refined-scalacheck" % refinedVersion % Test,

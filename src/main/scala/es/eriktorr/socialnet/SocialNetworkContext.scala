@@ -4,6 +4,7 @@ import cats.effect._
 import es.eriktorr.socialnet.application.PostMessageToPersonalTimeline
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.effect._
 
 final class SocialNetworkContext(timeMarker: TimeMarker[IO], timelines: Timelines[IO]) {
   def postMessageToPersonalTimeline: PostMessageToPersonalTimeline[IO] =
@@ -11,5 +12,6 @@ final class SocialNetworkContext(timeMarker: TimeMarker[IO], timelines: Timeline
 }
 
 object SocialNetworkContext {
-  def impl: SocialNetworkContext = new SocialNetworkContext(TimeMarker.impl[IO], ???)
+  def impl(config: SocialNetworkConfig): Resource[IO, SocialNetworkContext] =
+    new SocialNetworkContext(TimeMarker.impl[IO], ???).asResource
 }
