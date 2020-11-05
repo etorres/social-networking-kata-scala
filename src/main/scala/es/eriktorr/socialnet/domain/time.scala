@@ -12,7 +12,7 @@ object time {
     def now: F[TimeMark]
   }
 
-  object TimeMarker {
+  object LiveTimeMarker {
     def impl[F[_]: Applicative]: TimeMarker[F] = new TimeMarker[F] {
       override def now: F[LocalDateTime] = LocalDateTime.now().pure[F]
     }

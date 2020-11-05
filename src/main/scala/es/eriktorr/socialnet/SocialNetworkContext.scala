@@ -13,5 +13,5 @@ final class SocialNetworkContext(timeMarker: TimeMarker[IO], timelines: Timeline
 
 object SocialNetworkContext {
   def impl(config: SocialNetworkConfig): Resource[IO, SocialNetworkContext] =
-    new SocialNetworkContext(TimeMarker.impl[IO], ???).asResource
+    new SocialNetworkContext(LiveTimeMarker.impl[IO], ???).asResource
 }
