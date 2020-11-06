@@ -7,10 +7,6 @@ import es.eriktorr.socialnet.domain.timeline._
 
 final case class TimelinesState(events: List[TimelineEvent])
 
-object TimelinesState {
-  def empty: TimelinesState = TimelinesState(events = List.empty)
-}
-
 final class FakeTimelines[F[_]: Sync] private[infrastructure] (val ref: Ref[F, TimelinesState])
     extends Timelines[F] {
   override def save(event: TimelineEvent): F[Unit] =

@@ -1,53 +1,54 @@
 package es.eriktorr.socialnet.application
 
+import java.time.LocalDateTime
+
 import cats._
+import cats.data._
 import cats.implicits._
-import cats.kernel.Eq
 import es.eriktorr.socialnet.domain.infrastructure.TimelinesState
 import es.eriktorr.socialnet.domain.message._
-import es.eriktorr.socialnet.domain.timeline.TimelineEvent
-import es.eriktorr.socialnet.domain.user._
-import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.SocialNetworkState.emptyTimelines
-import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.{
-  withSocialNetworkContext,
-  SocialNetworkState
+import es.eriktorr.socialnet.domain.time._
+import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.SocialNetworkState.{
+  expectedStateFrom,
+  initialStateFrom
 }
-import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.{
-  messageBodyGen,
-  userNameGen
-}
-import org.scalacheck.cats.implicits._
+import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.withSocialNetworkContext
+import es.eriktorr.socialnet.shared.infrastructure.GeneratorSyntax._
+import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.messageGen
+import es.eriktorr.socialnet.shared.infrastructure.TimeGenerators._
+import org.scalacheck._
 import weaver._
 import weaver.scalacheck._
 
 object PostMessageToPersonalTimelineSuite extends SimpleIOSuite with IOCheckers {
   simpleTest("Post messages to a personal timeline") {
-    implicit val showMessage: Show[Message] = Show.show(_.toString)
-    implicit val eqSocialNetworkState: Eq[SocialNetworkState] = Eq.fromUniversalEquals
+    final case class TestCase(initialTimeMark: TimeMark, messages: NonEmptyList[Message])
 
-    val gen = (userNameGen, userNameGen, messageBodyGen).tupled.map {
-      case (from, to, body) => Message(from, to, body)
-    }
+    implicit val showTestCase: Show[TestCase] = Show.show(_.toString)
+    implicit val eqTimelinesState: Eq[TimelinesState] = Eq.fromUniversalEquals
 
-    forall(gen) { message =>
-      withSocialNetworkContext(initialState = emptyTimelines)(
-        _.postMessageToPersonalTimeline.post(message)
-      ) map {
-        case (state, _) =>
-          expect(
-            state === SocialNetworkState(timelinesState =
-              TimelinesState(events = List(TimelineEvent(???, message)))
+    val gen = (for {
+      initialTimeMark <- Arbitrary.arbitrary[LocalDateTime]
+      last <- messageGen
+      init <- Gen.containerOf[List, Message](messageGen)
+    } yield TestCase(initialTimeMark, NonEmptyList.ofInitLast(init, last)))
+      .sampleWithSeed("PostMessageToPersonalTimelineSuite")
+
+    forall(gen) {
+      case TestCase(initialTimeMark, messages) =>
+        val initialState = initialStateFrom(initialTimeMark, messages.tail)
+        withSocialNetworkContext(initialState)(
+          _.postMessageToPersonalTimeline.post(messages.head)
+        ) map {
+          case (finalState, _) =>
+            expect(
+              finalState.timelinesState === expectedStateFrom(
+                messages.head,
+                initialState,
+                finalState
+              ).timelinesState
             )
-          )
-      }
+        }
     }
   }
 }
-
-/*
-Posting: Alice can publish messages to a personal timeline
-
-> Alice -> I love the weather today
-> Bob -> Damn! We lost!
-> Bob -> Good game though.
- */

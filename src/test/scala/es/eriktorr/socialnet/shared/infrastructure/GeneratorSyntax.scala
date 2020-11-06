@@ -3,7 +3,7 @@ package es.eriktorr.socialnet.shared.infrastructure
 import org.scalacheck.Gen
 import org.scalacheck.rng.Seed
 
-class GeneratorSyntax {
+object GeneratorSyntax {
   @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
   implicit class GeneratorOps[A](self: Gen[A]) {
     def sampleWithSeed(name: String, seed: Seed = Seed.random()): A = {
