@@ -20,7 +20,7 @@ import org.scalacheck._
 import weaver._
 import weaver.scalacheck._
 
-object PostMessageToPersonalTimelineSuite extends SimpleIOSuite with IOCheckers {
+object PostMessageToTimelineSuite extends SimpleIOSuite with IOCheckers {
   simpleTest("Post messages to a personal timeline") {
     final case class TestCase(initialTimeMark: TimeMark, messages: NonEmptyList[Message])
 

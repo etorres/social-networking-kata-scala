@@ -10,7 +10,8 @@ final case class TimelinesState(events: List[TimelineEvent])
 
 final class FakeTimelines[F[_]: Sync] private[infrastructure] (val ref: Ref[F, TimelinesState])
     extends Timelines[F] {
-  override def read(userName: UserName): F[TimelineEvents] = ???
+  override def readBy(userName: UserName): F[TimelineEvents] =
+    ref.get.map(_.events.filter(_.message.from === userName))
 
   override def save(event: TimelineEvent): F[Unit] =
     ref.get.flatMap(current => ref.set(current.copy(event :: current.events)))

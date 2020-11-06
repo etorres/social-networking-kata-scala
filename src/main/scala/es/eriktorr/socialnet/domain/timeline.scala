@@ -10,7 +10,7 @@ object timeline {
   type TimelineEvents = List[TimelineEvent]
 
   trait Timelines[F[_]] {
-    def read(userName: UserName): F[TimelineEvents]
+    def readBy(userName: UserName): F[TimelineEvents]
     def save(event: TimelineEvent): F[Unit]
   }
 }
