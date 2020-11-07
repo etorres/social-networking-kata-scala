@@ -20,6 +20,7 @@ object SocialNetworkApp extends IOApp {
         _ <- putStrLn("Welcome to yet another social network!")
         _ <- putStrLn("Please enter your name: ")
         name <- readLn
+        userName <- IO.fromEither(UserName.fromString(name))
         _ <- putStrLn(s"Hi $name, now you can post to someone's timeline:")
         _ <- putStrLn(s"<her/his name> -> <message>")
         request <- readLn
@@ -30,7 +31,7 @@ object SocialNetworkApp extends IOApp {
             case PostCommand(to, messageBody) =>
               programResource(config).use(
                 _.postMessageToPersonalTimeline
-                  .post(Message(UserName.fromString(name), to, messageBody))
+                  .post(Message(userName, to, messageBody))
               )
           }
           .as(ExitCode.Success)

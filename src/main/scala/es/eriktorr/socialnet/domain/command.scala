@@ -10,6 +10,7 @@ import scala.util.matching.Regex
 object command {
   sealed trait RequestError extends NoStackTrace
 
+  final case class InvalidParameters(error: String) extends RequestError
   case object UnknownCommand extends RequestError
 
   sealed trait Command
@@ -21,7 +22,13 @@ object command {
 
     def fromString(input: String): Either[RequestError, Command] = input match {
       case posting(user, message) =>
-        PostCommand(UserName.fromString(user), MessageBody.fromString(message)).asRight
+        (for {
+          userName <- UserName.fromString(user)
+          messageBody = MessageBody.fromString(message)
+        } yield PostCommand(userName, messageBody)) match {
+          case Left(cause) => InvalidParameters(cause.error).asLeft
+          case Right(command) => command.asRight
+        }
       case _ => UnknownCommand.asLeft
     }
   }

@@ -8,7 +8,7 @@ import eu.timepit.refined.types.string._
 import io.estatico.newtype.macros.newtype
 
 object message {
-  @newtype case class MessageBody(unBody: NonEmptyString)
+  @newtype case class MessageBody(private val unBody: NonEmptyString)
 
   object MessageBody {
     def fromString(input: String): MessageBody = MessageBody(unsafeApply(input))
