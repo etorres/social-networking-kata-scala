@@ -22,7 +22,8 @@ object SocialNetworkGenerators {
   @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
   val messageBodyGen: Gen[MessageBody] = maybeMessageBodyGen.map(_.toOption.get)
 
-  val messageGen: Gen[Message] = (userNameGen, userNameGen, messageBodyGen).tupled.map {
-    case (from, to, body) => Message(from, to, body)
-  }
+  def messageGen(fromGen: Gen[UserName]): Gen[Message] =
+    (fromGen, userNameGen, messageBodyGen).tupled.map {
+      case (from, to, body) => Message(from, to, body)
+    }
 }

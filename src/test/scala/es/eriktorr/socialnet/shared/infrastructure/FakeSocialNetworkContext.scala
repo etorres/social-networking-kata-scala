@@ -5,12 +5,15 @@ import cats.effect.concurrent.Ref
 import cats.implicits._
 import es.eriktorr.socialnet.SocialNetworkContext
 import es.eriktorr.socialnet.domain.infrastructure.{
+  FakeSubscriptions,
   FakeTimeMarker,
   FakeTimelines,
+  SubscriptionsState,
   TimeMarkerState,
   TimelinesState
 }
 import es.eriktorr.socialnet.domain.message._
+import es.eriktorr.socialnet.domain.subscription._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
 
@@ -18,6 +21,7 @@ import scala.annotation.tailrec
 
 object FakeSocialNetworkContext {
   final case class SocialNetworkState(
+    subscriptionsState: SubscriptionsState,
     timeMarkerState: TimeMarkerState,
     timelinesState: TimelinesState
   )
@@ -25,7 +29,8 @@ object FakeSocialNetworkContext {
   object SocialNetworkState {
     def initialStateFrom(
       initialTimeMark: TimeMark,
-      messages: List[Message]
+      messages: Messages,
+      subscriptions: UsersSubscriptions
     ): SocialNetworkState = {
       @tailrec
       def timelineEventsFrom(
@@ -47,6 +52,7 @@ object FakeSocialNetworkContext {
       val events: List[TimelineEvent] = timelineEventsFrom(messages, List.empty)
 
       SocialNetworkState(
+        subscriptionsState = SubscriptionsState(subscriptions),
         timeMarkerState =
           TimeMarkerState.startingAt(events.map(_.timeMark).headOption.getOrElse(initialTimeMark)),
         timelinesState = TimelinesState(events)
@@ -72,11 +78,13 @@ object FakeSocialNetworkContext {
     initialState: SocialNetworkState
   )(runTest: SocialNetworkContext => IO[A]): IO[(SocialNetworkState, A)] =
     for {
-      (timeMakerRef, timelinesRef) <- (
+      (subscriptionsRef, timeMakerRef, timelinesRef) <- (
+        refFrom(initialState.subscriptionsState),
         refFrom(initialState.timeMarkerState),
         refFrom(initialState.timelinesState)
       ).tupled
       context = new SocialNetworkContext(
+        FakeSubscriptions.impl[IO](subscriptionsRef),
         FakeTimeMarker.impl[IO](timeMakerRef),
         FakeTimelines.impl[IO](timelinesRef)
       )

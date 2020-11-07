@@ -22,6 +22,8 @@ object message {
 
   final case class Message(from: UserName, to: UserName, body: MessageBody)
 
+  type Messages = List[Message]
+
   object Message {
     implicit val eqMessage: Eq[Message] = semiauto.eq
     implicit val eqShow: Show[Message] = semiauto.show

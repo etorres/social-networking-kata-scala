@@ -8,7 +8,7 @@ import cats.implicits._
 import es.eriktorr.socialnet.domain.timeline._
 import es.eriktorr.socialnet.domain.user._
 
-final case class TimelinesState(events: List[TimelineEvent])
+final case class TimelinesState(events: TimelineEvents)
 
 object TimelinesState {
   implicit val eqTimelinesState: Eq[TimelinesState] = semiauto.eq

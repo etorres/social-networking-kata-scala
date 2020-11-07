@@ -19,6 +19,7 @@ object subscription {
   }
 
   type TimelineSubscriptions = List[TimelineSubscription]
+  type UsersSubscriptions = Map[Subscriber, TimelineSubscriptions]
 
   trait Subscriptions[F[_]] {
     def subscribe(subscriber: Subscriber, subscription: TimelineSubscription): F[Unit]
