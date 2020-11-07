@@ -28,7 +28,7 @@ object PostMessageToTimelineSuite extends SimpleIOSuite with IOCheckers {
     implicit val eqTimelinesState: Eq[TimelinesState] = Eq.fromUniversalEquals
 
     val gen = (for {
-      initialTimeMark <- Arbitrary.arbitrary[LocalDateTime]
+      initialTimeMark <- Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
       last <- messageGen
       init <- Gen.containerOf[List, Message](messageGen)
     } yield TestCase(initialTimeMark, NonEmptyList.ofInitLast(init, last)))

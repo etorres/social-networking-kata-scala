@@ -10,7 +10,8 @@ object user {
 
   object UserName {
     def fromString(input: String): UserName = UserName(unsafeApply(input))
-  }
 
-  implicit val eqUserName: Eq[UserName] = Eq.fromUniversalEquals
+    implicit val eqUserName: Eq[UserName] = Eq.fromUniversalEquals
+    implicit val showUserName: Show[UserName] = Show.show(_.toString)
+  }
 }

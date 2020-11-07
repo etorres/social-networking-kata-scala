@@ -8,13 +8,13 @@ import scala.util.control.NoStackTrace
 import scala.util.matching.Regex
 
 object command {
-  sealed trait Command
-
-  final case class PostCommand(to: UserName, messageBody: MessageBody) extends Command
-
   sealed trait RequestError extends NoStackTrace
 
   case object UnknownCommand extends RequestError
+
+  sealed trait Command
+
+  final case class PostCommand(to: UserName, messageBody: MessageBody) extends Command
 
   object Command {
     val posting: Regex = "(.+) -> (.+)".r

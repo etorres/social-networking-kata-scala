@@ -1,5 +1,7 @@
 package es.eriktorr.socialnet.domain
 
+import cats._
+import cats.derived._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.user._
@@ -7,10 +9,15 @@ import es.eriktorr.socialnet.domain.user._
 object timeline {
   final case class TimelineEvent(timeMark: TimeMark, message: Message)
 
+  object TimelineEvent {
+    implicit val eqTimelineEvent: Eq[TimelineEvent] = semiauto.eq
+    implicit val showTimelineEvent: Show[TimelineEvent] = semiauto.show
+  }
+
   type TimelineEvents = List[TimelineEvent]
 
   trait Timelines[F[_]] {
-    def readBy(userName: UserName): F[TimelineEvents]
+    def readBy(userNames: UserName*): F[TimelineEvents]
     def save(event: TimelineEvent): F[Unit]
   }
 }

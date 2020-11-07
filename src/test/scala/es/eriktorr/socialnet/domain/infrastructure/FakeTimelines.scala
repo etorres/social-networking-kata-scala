@@ -10,8 +10,8 @@ final case class TimelinesState(events: List[TimelineEvent])
 
 final class FakeTimelines[F[_]: Sync] private[infrastructure] (val ref: Ref[F, TimelinesState])
     extends Timelines[F] {
-  override def readBy(userName: UserName): F[TimelineEvents] =
-    ref.get.map(_.events.filter(_.message.from === userName))
+  override def readBy(userNames: UserName*): F[TimelineEvents] =
+    ref.get.map(_.events.filter(e => userNames.toList.contains_(e.message.from)))
 
   override def save(event: TimelineEvent): F[Unit] =
     ref.get.flatMap(current => ref.set(current.copy(event :: current.events)))
