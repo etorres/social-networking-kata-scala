@@ -1,5 +1,7 @@
 package es.eriktorr.socialnet.domain.infrastructure
 
+import cats._
+import cats.derived._
 import cats.effect._
 import cats.effect.concurrent.Ref
 import cats.implicits._
@@ -7,6 +9,10 @@ import es.eriktorr.socialnet.domain.timeline._
 import es.eriktorr.socialnet.domain.user._
 
 final case class TimelinesState(events: List[TimelineEvent])
+
+object TimelinesState {
+  implicit val eqTimelinesState: Eq[TimelinesState] = semiauto.eq
+}
 
 final class FakeTimelines[F[_]: Sync] private[infrastructure] (val ref: Ref[F, TimelinesState])
     extends Timelines[F] {

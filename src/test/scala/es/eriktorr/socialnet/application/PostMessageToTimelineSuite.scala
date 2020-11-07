@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 
 import cats._
 import cats.data._
+import cats.derived._
 import cats.implicits._
-import es.eriktorr.socialnet.domain.infrastructure.TimelinesState
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.SocialNetworkState.{
@@ -24,8 +24,9 @@ object PostMessageToTimelineSuite extends SimpleIOSuite with IOCheckers {
   simpleTest("Post messages to a personal timeline") {
     final case class TestCase(initialTimeMark: TimeMark, messages: NonEmptyList[Message])
 
-    implicit val showTestCase: Show[TestCase] = Show.show(_.toString)
-    implicit val eqTimelinesState: Eq[TimelinesState] = Eq.fromUniversalEquals
+    object TestCase {
+      implicit val showTestCase: Show[TestCase] = semiauto.show
+    }
 
     val gen = (for {
       initialTimeMark <- Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
