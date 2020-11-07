@@ -9,7 +9,7 @@ import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
 object message {
-  @newtype case class MessageBody(private val unBody: String)
+  @newtype class MessageBody(val unBody: String)
 
   object MessageBody {
     def fromString(str: String): Either[InvalidParameter, MessageBody] =
