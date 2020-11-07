@@ -2,16 +2,19 @@ package es.eriktorr.socialnet.domain
 
 import cats._
 import cats.derived._
+import cats.implicits.catsSyntaxEitherId
+import es.eriktorr.socialnet.domain.error._
 import es.eriktorr.socialnet.domain.user._
-import eu.timepit.refined.api.Refined.unsafeApply
-import eu.timepit.refined.types.string._
 import io.estatico.newtype.macros.newtype
+import io.estatico.newtype.ops._
 
 object message {
-  @newtype case class MessageBody(private val unBody: NonEmptyString)
+  @newtype case class MessageBody(private val unBody: String)
 
   object MessageBody {
-    def fromString(input: String): MessageBody = MessageBody(unsafeApply(input))
+    def fromString(str: String): Either[InvalidParameter, MessageBody] =
+      if (str.isBlank) InvalidParameter("Message body cannot be empty").asLeft
+      else str.trim.coerce.asRight
 
     implicit val eqMessageBody: Eq[MessageBody] = Eq.fromUniversalEquals
     implicit val showMessageBody: Show[MessageBody] = Show.show(_.toString)

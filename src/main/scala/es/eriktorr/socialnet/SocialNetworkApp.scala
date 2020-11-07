@@ -4,6 +4,7 @@ import cats.effect.Console.io._
 import cats.effect._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.command._
+import es.eriktorr.socialnet.domain.error._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.user._
 import io.chrisdavenport.log4cats.Logger
