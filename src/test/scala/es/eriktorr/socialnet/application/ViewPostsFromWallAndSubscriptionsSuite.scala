@@ -11,6 +11,7 @@ import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.user._
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.SocialNetworkState.initialStateFrom
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.withSocialNetworkContext
+import es.eriktorr.socialnet.shared.infrastructure.GeneratorSyntax._
 import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.{messageGen, userNameGen}
 import es.eriktorr.socialnet.shared.infrastructure.TimeGenerators._
 import org.scalacheck._
@@ -31,7 +32,7 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
       implicit val showTestCase: Show[TestCase] = semiauto.show
     }
 
-    val gen = for {
+    val gen = (for {
       initialTimeMark <- Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
       subscriber <- userNameGen
       otherUsers <- Gen.containerOfN[List, UserName](4, userNameGen)
@@ -57,7 +58,7 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
       subscribedTo,
       allMessages,
       wallAndSubscriptionMessages
-    )
+    )).sampleWithSeed("ViewPostsFromWallAndSubscriptionsSuite")
 
     forall(gen) {
       case TestCase(
