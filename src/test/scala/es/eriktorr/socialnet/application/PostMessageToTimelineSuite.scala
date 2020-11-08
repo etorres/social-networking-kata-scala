@@ -14,7 +14,7 @@ import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.Soci
 }
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.withSocialNetworkContext
 import es.eriktorr.socialnet.shared.infrastructure.GeneratorSyntax._
-import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.{messageGen, userNameGen}
+import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.messageGen
 import es.eriktorr.socialnet.shared.infrastructure.TimeGenerators._
 import org.scalacheck._
 import weaver._
@@ -30,8 +30,8 @@ object PostMessageToTimelineSuite extends SimpleIOSuite with IOCheckers {
 
     val gen = (for {
       initialTimeMark <- Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
-      last <- messageGen(fromGen = userNameGen)
-      init <- Gen.containerOf[List, Message](messageGen(fromGen = userNameGen))
+      last <- messageGen()
+      init <- Gen.containerOf[List, Message](messageGen())
     } yield TestCase(initialTimeMark, NonEmptyList.ofInitLast(init, last)))
       .sampleWithSeed("PostMessageToPersonalTimelineSuite")
 

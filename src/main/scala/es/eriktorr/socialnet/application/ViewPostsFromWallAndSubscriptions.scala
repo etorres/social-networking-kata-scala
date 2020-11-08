@@ -4,13 +4,14 @@ import cats.effect._
 import es.eriktorr.socialnet.domain.subscription._
 import es.eriktorr.socialnet.domain.timeline._
 
-trait ViewPostsFromAllSubscriptions[F[_]] {
+trait ViewPostsFromWallAndSubscriptions[F[_]] {
   def viewPostsByAll: F[TimelineEvents]
 }
 
-object ViewPostsFromAllSubscriptions {
+object ViewPostsFromWallAndSubscriptions {
   def impl[F[_]: Sync](
     timelines: Timelines[F],
     subscriptions: Subscriptions[F]
-  ): ViewPostsFromAllSubscriptions[F] = ???
+  ): ViewPostsFromWallAndSubscriptions[F] = ???
 }
+// TODO: all subscriptions and her own wall

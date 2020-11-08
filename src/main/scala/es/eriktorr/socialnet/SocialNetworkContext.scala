@@ -4,8 +4,8 @@ import cats.effect._
 import es.eriktorr.socialnet.application.{
   PostMessageToTimeline,
   SubscribeToTimeline,
-  ViewPostsFromAllSubscriptions,
-  ViewPostsFromTimeline
+  ViewPostsFromTimeline,
+  ViewPostsFromWallAndSubscriptions
 }
 import es.eriktorr.socialnet.domain.subscription.Subscriptions
 import es.eriktorr.socialnet.domain.time._
@@ -20,8 +20,8 @@ final class SocialNetworkContext(
   def postMessageToPersonalTimeline: PostMessageToTimeline[IO] =
     PostMessageToTimeline.impl[IO](timeMarker, timelines)
   def subscribeToTimeline: SubscribeToTimeline[IO] = SubscribeToTimeline.impl[IO](subscriptions)
-  def viewPostsFromAllSubscriptions: ViewPostsFromAllSubscriptions[IO] =
-    ViewPostsFromAllSubscriptions.impl[IO](timelines, subscriptions)
+  def viewPostsFromAllSubscriptions: ViewPostsFromWallAndSubscriptions[IO] =
+    ViewPostsFromWallAndSubscriptions.impl[IO](timelines, subscriptions)
   def viewPostsFromTimeline: ViewPostsFromTimeline[IO] = ViewPostsFromTimeline.impl[IO](timelines)
 }
 

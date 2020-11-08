@@ -17,10 +17,10 @@ object command {
 
     def fromString(input: String): Either[RequestError, Command] = input match {
       case posting(user, message) =>
-        (for {
+        for {
           userName <- UserName.fromString(user)
           messageBody <- MessageBody.fromString(message)
-        } yield PostCommand(userName, messageBody))
+        } yield PostCommand(userName, messageBody)
       case _ => UnknownCommand.asLeft
     }
   }
