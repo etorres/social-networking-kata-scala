@@ -73,7 +73,9 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
             allMessages,
             Map(Subscriber(subscriber) -> subscribedTo.map(a => TimelineSubscription(a)))
           )
-        withSocialNetworkContext(initialState)(_.viewPostsFromAllSubscriptions.viewPostsByAll) map {
+        withSocialNetworkContext(initialState)(
+          _.viewPostsFromAllSubscriptions.viewAllPostsFor(subscriber)
+        ) map {
           case (finalState, testResult) =>
             expect(testResult === finalState.timelinesState.events.filter { e =>
               wallAndSubscriptionMessages.contains_(e.message)
