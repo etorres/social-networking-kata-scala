@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: s3c4Et
+    ports:
+      - 5432:5432
+    volumes:
+      - "$PWD/docker/postgres:/docker-entrypoint-initdb.d"
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080

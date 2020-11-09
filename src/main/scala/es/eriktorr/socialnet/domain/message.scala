@@ -20,7 +20,7 @@ object message {
     implicit val showMessageBody: Show[MessageBody] = Show.show(_.toString)
   }
 
-  final case class Message(from: UserName, to: UserName, body: MessageBody)
+  final case class Message(sender: UserName, addressee: UserName, body: MessageBody)
 
   type Messages = List[Message]
 

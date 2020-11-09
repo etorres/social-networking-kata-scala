@@ -7,14 +7,12 @@ import cats.implicits._
 import io.estatico.newtype.macros.newtype
 
 object time {
-  @newtype case class TimeMark(unTimeMark: LocalDateTime)
+  @newtype case class TimeMark(unTimeMark: LocalDateTime) {
+    def isAfter(other: TimeMark): Boolean = unTimeMark.isAfter(other.unTimeMark)
+    def plusMinutes(minutes: Long): TimeMark = TimeMark(unTimeMark.plusMinutes(minutes))
+  }
 
   object TimeMark {
-    implicit class TimeMarkOps(self: TimeMark) {
-      def isAfter(other: TimeMark): Boolean = self.unTimeMark.isAfter(other.unTimeMark)
-      def plusMinutes(minutes: Long): TimeMark = TimeMark(self.unTimeMark.plusMinutes(minutes))
-    }
-
     implicit val eqTimeMark: Eq[TimeMark] = Eq.fromUniversalEquals
     implicit val showTimeMark: Show[TimeMark] = Show.show(_.toString)
   }

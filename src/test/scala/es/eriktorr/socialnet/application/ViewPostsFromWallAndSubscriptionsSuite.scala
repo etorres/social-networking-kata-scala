@@ -39,15 +39,15 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
       (subscribedTo, notSubscribedTo) = otherUsers.splitAt(2)
       allUsers = subscriber :: (subscribedTo ++ notSubscribedTo)
       wallMessages <- Gen.containerOf[List, Message](
-        messageGen(fromGen = Gen.oneOf(allUsers), toGen = Gen.const(subscriber))
+        messageGen(senderGen = Gen.oneOf(allUsers), addresseeGen = Gen.const(subscriber))
       )
       subscribedWalls <- Gen.containerOf[List, Message](
-        messageGen(fromGen = Gen.oneOf(allUsers), toGen = Gen.oneOf(subscribedTo))
+        messageGen(senderGen = Gen.oneOf(allUsers), addresseeGen = Gen.oneOf(subscribedTo))
       )
       notSubscribedWalls <- Gen.containerOf[List, Message](
         messageGen(
-          fromGen = Gen.oneOf(allUsers),
-          toGen = Gen.oneOf(notSubscribedTo)
+          senderGen = Gen.oneOf(allUsers),
+          addresseeGen = Gen.oneOf(notSubscribedTo)
         )
       )
       wallAndSubscriptionMessages = wallMessages ++ subscribedWalls

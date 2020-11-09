@@ -7,7 +7,9 @@ import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
 object user {
-  @newtype class UserName(val unUserName: String)
+  @newtype class UserName(val unUserName: String) {
+    def mkString(separator: String): String = unUserName.mkString(separator)
+  }
 
   object UserName {
     def fromString(str: String): Either[InvalidParameter, UserName] =

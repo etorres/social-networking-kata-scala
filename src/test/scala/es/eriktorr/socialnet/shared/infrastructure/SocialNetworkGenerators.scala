@@ -23,10 +23,10 @@ object SocialNetworkGenerators {
   val messageBodyGen: Gen[MessageBody] = maybeMessageBodyGen.map(_.toOption.get)
 
   def messageGen(
-    fromGen: Gen[UserName] = userNameGen,
-    toGen: Gen[UserName] = userNameGen
+    senderGen: Gen[UserName] = userNameGen,
+    addresseeGen: Gen[UserName] = userNameGen
   ): Gen[Message] =
-    (fromGen, toGen, messageBodyGen).tupled.map {
-      case (from, to, body) => Message(from, to, body)
+    (senderGen, addresseeGen, messageBodyGen).tupled.map {
+      case (sender, addressee, body) => Message(sender, addressee, body)
     }
 }
