@@ -1,6 +1,6 @@
 package es.eriktorr.socialnet.infrastructure
 
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 import cats.effect._
 import cats.implicits._
@@ -17,7 +17,7 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
     for {
       rows <- sql"""
         SELECT
-          received_at AS timeMark,
+          received_at AS receivedAt,
           sender,
           addressee,
           body
@@ -39,7 +39,10 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
             ).tupled
               .map {
                 case (sender, addressee, body) =>
-                  TimelineEvent(TimeMark(row.timeMark), Message(sender, addressee, body))
+                  TimelineEvent(
+                    TimeMark(row.receivedAt.toLocalDateTime),
+                    Message(sender, addressee, body)
+                  )
               }
           }
           .traverse(identity)
@@ -65,7 +68,7 @@ object JdbcTimelines {
   def apply(transactor: Transactor[IO]): JdbcTimelines = new JdbcTimelines(transactor)
 
   final case class JdbcTimelineEvent(
-    timeMark: LocalDateTime,
+    receivedAt: OffsetDateTime,
     sender: String,
     addressee: String,
     body: String

@@ -6,6 +6,7 @@ import cats._
 import cats.derived._
 import cats.effect._
 import cats.implicits._
+import doobie.implicits._
 import doobie.hikari._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
@@ -82,8 +83,8 @@ object JdbcTimelinesSuite extends IOSuite with IOCheckers {
         val timelines = JdbcTimelines(transactor)
         for {
           _ <- allEvents.traverse_(timelines.save)
-          events <- JdbcTimelines(transactor).readBy(userName)
-        } yield expect(events === expectedEvents)
+          events <- timelines.readBy(userName)
+        } yield expect(events == expectedEvents)
     }
   }
 }
