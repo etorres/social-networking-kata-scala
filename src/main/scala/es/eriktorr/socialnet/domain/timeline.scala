@@ -7,7 +7,10 @@ import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.user._
 
 object timeline {
-  final case class TimelineEvent(timeMark: TimeMark, message: Message)
+  final case class TimelineEvent(timeMark: TimeMark, message: Message) {
+    def isAfter(other: TimelineEvent): Boolean = timeMark.isAfter(other.timeMark)
+    def isBefore(other: TimelineEvent): Boolean = timeMark.isBefore(other.timeMark)
+  }
 
   object TimelineEvent {
     implicit val eqTimelineEvent: Eq[TimelineEvent] = semiauto.eq

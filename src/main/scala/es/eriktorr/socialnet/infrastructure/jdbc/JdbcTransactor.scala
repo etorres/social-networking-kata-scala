@@ -5,7 +5,7 @@ import doobie.hikari._
 
 import scala.concurrent.ExecutionContext
 
-final class PostgresTransactor private (jdbcConfiguration: JdbcConfiguration)(
+final class JdbcTransactor private (jdbcConfiguration: JdbcConfiguration)(
   implicit connectEc: ExecutionContext,
   blocker: Blocker,
   contextShift: ContextShift[IO]
@@ -23,11 +23,11 @@ final class PostgresTransactor private (jdbcConfiguration: JdbcConfiguration)(
     } yield xa
 }
 
-object PostgresTransactor {
+object JdbcTransactor {
   def apply(jdbcConfiguration: JdbcConfiguration)(
     implicit connectEc: ExecutionContext,
     blocker: Blocker,
     contextShift: ContextShift[IO]
-  ): PostgresTransactor =
-    new PostgresTransactor(jdbcConfiguration)(connectEc, blocker, contextShift)
+  ): JdbcTransactor =
+    new JdbcTransactor(jdbcConfiguration)(connectEc, blocker, contextShift)
 }

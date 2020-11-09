@@ -7,7 +7,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE DATABASE social_network;
     GRANT ALL PRIVILEGES ON DATABASE social_network TO social_network;
     \c social_network
-    CREATE TABLE messages (
+    CREATE TABLE timeline_events (
       id SERIAL PRIMARY KEY,
       received_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
       sender VARCHAR(24) NOT NULL,

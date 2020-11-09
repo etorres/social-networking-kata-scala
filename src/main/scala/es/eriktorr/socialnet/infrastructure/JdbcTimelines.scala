@@ -16,17 +16,17 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
   override def readBy(userNames: UserName*): IO[TimelineEvents] =
     for {
       rows <- sql"""
-          SELECT
-            received_at AS timeMark,
-            sender,
-            addressee,
-            body
-          FROM messages
-          WHERE
-            addressee IN (${userNames.mkString(",")})
-          ORDER BY time_mark DESC
-          LIMIT 100
-    """.query[JdbcTimelines.JdbcTimelineEvent]
+        SELECT
+          received_at AS timeMark,
+          sender,
+          addressee,
+          body
+        FROM timeline_events
+        WHERE
+          addressee IN (${userNames.mkString(",")})
+        ORDER BY received_at DESC
+        LIMIT 100"""
+        .query[JdbcTimelines.JdbcTimelineEvent]
         .to[List]
         .transact(transactor)
       events <- IO.fromEither(

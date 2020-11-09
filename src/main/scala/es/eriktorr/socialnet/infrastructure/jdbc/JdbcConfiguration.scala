@@ -6,3 +6,9 @@ final case class JdbcConfiguration(
   user: String,
   password: String
 )
+
+object JdbcConfiguration {
+  val postgresDriverClassName: String = "org.postgresql.Driver"
+  def postgres(connectUrl: String, user: String, password: String): JdbcConfiguration =
+    JdbcConfiguration(driverClassName = postgresDriverClassName, connectUrl, user, password)
+}

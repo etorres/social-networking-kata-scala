@@ -9,6 +9,7 @@ import io.estatico.newtype.macros.newtype
 object time {
   @newtype case class TimeMark(unTimeMark: LocalDateTime) {
     def isAfter(other: TimeMark): Boolean = unTimeMark.isAfter(other.unTimeMark)
+    def isBefore(other: TimeMark): Boolean = unTimeMark.isBefore(other.unTimeMark)
     def plusMinutes(minutes: Long): TimeMark = TimeMark(unTimeMark.plusMinutes(minutes))
   }
 
