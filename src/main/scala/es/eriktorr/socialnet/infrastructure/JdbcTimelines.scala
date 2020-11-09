@@ -46,9 +46,19 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
       )
     } yield events
 
-  override def save(event: TimelineEvent): IO[Unit] = ???
-
-  // INSERT INTO "exposed" ("exposed_id", "key", "received_at", "rolling_start_number", "rolling_period", "transmission_risk_level") VALUES (1, 'f79211eaadc10242ac120002', '2020-09-15 20:35:09.65198', 2655072, 1209600000, 3);
+  override def save(event: TimelineEvent): IO[Unit] =
+    for {
+      _ <- sql"""
+        INSERT INTO 
+          timeline_events (received_at, sender, addressee, body) 
+        VALUES (
+          ${event.timeMark.unTimeMark}, 
+          ${event.message.sender.unUserName},
+          ${event.message.addressee.unUserName},
+          ${event.message.body.unBody}
+        )
+       """.update.run.transact(transactor)
+    } yield ()
 }
 
 object JdbcTimelines {
