@@ -27,7 +27,9 @@ object JdbcTimelinesSuite extends IOSuite with IOCheckers {
   implicit val evEc: ExecutionContextExecutor = ec
   implicit val evBlocker: Blocker = Blocker.liftExecutionContext(ec)
 
-  override val maxParallelism = 1
+  override def maxParallelism: Int = 1
+  override def checkConfig: CheckConfig =
+    super.checkConfig.copy(perPropertyParallelism = 1)
 
   override type Res = HikariTransactor[IO]
 
@@ -84,13 +86,7 @@ object JdbcTimelinesSuite extends IOSuite with IOCheckers {
       case TestCase(userName, allEvents, expectedEvents) =>
         val timelines = JdbcTimelines(transactor)
         for {
-          _ <- sql"DELETE FROM timeline_events".update.run.transact(transactor)
-          _ = println("BEFORE!")
-          _ <- allEvents.traverse_ { event =>
-            println("MESSAGE!")
-            timelines.save(event)
-          }
-          _ = println("DONE!")
+          _ <- allEvents.traverse_(timelines.save)
           events <- timelines.readBy(userName)
         } yield expect(events == expectedEvents)
     }
