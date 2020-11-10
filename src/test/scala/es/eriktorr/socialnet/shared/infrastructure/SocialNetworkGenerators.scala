@@ -4,7 +4,7 @@ import cats.implicits._
 import es.eriktorr.socialnet.domain.error._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.user._
-import org.scalacheck.Gen
+import org.scalacheck._
 import org.scalacheck.cats.implicits._
 
 object SocialNetworkGenerators {

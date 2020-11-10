@@ -4,18 +4,11 @@ import cats.effect._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import es.eriktorr.socialnet.SocialNetworkContext
-import es.eriktorr.socialnet.domain.infrastructure.{
-  FakeSubscriptions,
-  FakeTimeMarker,
-  FakeTimelines,
-  SubscriptionsState,
-  TimeMarkerState,
-  TimelinesState
-}
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.subscription._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.infrastructure._
 
 import scala.annotation.tailrec
 

@@ -2,7 +2,8 @@ package es.eriktorr.socialnet.shared.infrastructure
 
 import java.time.LocalDateTime
 
-import org.scalacheck.{Arbitrary, Gen}
+import es.eriktorr.socialnet.domain.time._
+import org.scalacheck._
 
 object TimeGenerators {
   implicit lazy val localDateTimeGen: Arbitrary[LocalDateTime] = {
@@ -17,4 +18,6 @@ object TimeGenerators {
       } yield LocalDateTime.ofEpochSecond(seconds, 0, UTC)
     }
   }
+
+  val timeMarkGen: Gen[TimeMark] = Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
 }

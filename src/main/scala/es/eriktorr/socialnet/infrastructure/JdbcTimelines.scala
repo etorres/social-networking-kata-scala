@@ -60,7 +60,7 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
           ${event.message.addressee.unUserName},
           ${event.message.body.unBody}
         )
-       """.update.run.transact(transactor)
+        """.update.run.transact(transactor)
     } yield ()
 }
 

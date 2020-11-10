@@ -1,4 +1,4 @@
-package es.eriktorr.socialnet.domain.infrastructure
+package es.eriktorr.socialnet.infrastructure
 
 import cats._
 import cats.derived._
