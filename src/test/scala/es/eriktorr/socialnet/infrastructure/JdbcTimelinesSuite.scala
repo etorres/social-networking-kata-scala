@@ -6,8 +6,6 @@ import cats._
 import cats.derived._
 import cats.effect._
 import cats.implicits._
-import doobie.implicits._
-import doobie.hikari._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
@@ -23,20 +21,15 @@ import weaver.scalacheck._
 
 import scala.concurrent.ExecutionContextExecutor
 
-object JdbcTimelinesSuite extends IOSuite with IOCheckers {
+object JdbcTimelinesSuite extends SimpleIOSuite with IOCheckers {
   implicit val evEc: ExecutionContextExecutor = ec
   implicit val evBlocker: Blocker = Blocker.liftExecutionContext(ec)
 
   override def maxParallelism: Int = 1
   override def checkConfig: CheckConfig =
-    super.checkConfig.copy(perPropertyParallelism = 1)
+    super.checkConfig.copy(minimumSuccessful = 10, perPropertyParallelism = 1)
 
-  override type Res = HikariTransactor[IO]
-
-  override def sharedResource: Resource[IO, Res] =
-    JdbcTestTransactor.testTransactorResource(JdbcTestTransactor.socialNetworkJdbcConfig)
-
-  test("Write and read messages from database") { transactor =>
+  simpleTest("Write and read messages from database") {
     final case class TestCase(
       userName: UserName,
       allEvents: TimelineEvents,
@@ -82,13 +75,18 @@ object JdbcTimelinesSuite extends IOSuite with IOCheckers {
       targetEvents.sortWith(_ isAfter _)
     )).sampleWithSeed("JdbcTimelinesSuite")
 
+    val testResources =
+      JdbcTestTransactor.testTransactorResource(JdbcTestTransactor.socialNetworkJdbcConfig)
+
     forall(gen) {
       case TestCase(userName, allEvents, expectedEvents) =>
-        val timelines = JdbcTimelines(transactor)
-        for {
-          _ <- allEvents.traverse_(timelines.save)
-          events <- timelines.readBy(userName)
-        } yield expect(events == expectedEvents)
+        testResources.use { transactor =>
+          val timelines = JdbcTimelines(transactor)
+          for {
+            _ <- allEvents.traverse_(timelines.save)
+            events <- timelines.readBy(userName)
+          } yield expect(events == expectedEvents)
+        }
     }
   }
 }

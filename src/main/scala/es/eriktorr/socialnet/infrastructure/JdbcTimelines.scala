@@ -1,6 +1,6 @@
 package es.eriktorr.socialnet.infrastructure
 
-import java.time.OffsetDateTime
+import java.time.{OffsetDateTime, ZoneOffset}
 
 import cats.effect._
 import cats.implicits._
@@ -40,7 +40,7 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
               .map {
                 case (sender, addressee, body) =>
                   TimelineEvent(
-                    TimeMark(row.receivedAt.toLocalDateTime),
+                    TimeMark(row.receivedAt.withOffsetSameLocal(ZoneOffset.UTC).toLocalDateTime),
                     Message(sender, addressee, body)
                   )
               }
@@ -55,7 +55,7 @@ final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines
         INSERT INTO 
           timeline_events (received_at, sender, addressee, body) 
         VALUES (
-          ${event.timeMark.unTimeMark}, 
+          ${event.timeMark.unTimeMark.atOffset(ZoneOffset.UTC)}, 
           ${event.message.sender.unUserName},
           ${event.message.addressee.unUserName},
           ${event.message.body.unBody}
