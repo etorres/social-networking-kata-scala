@@ -4,13 +4,11 @@ import cats.effect._
 import doobie._
 import doobie.implicits._
 import es.eriktorr.socialnet.domain.subscription._
-import io.estatico.newtype._
+import es.eriktorr.socialnet.infrastructure.jdbc.NewTypeMapping
 
-final class JdbcSubscriptions private (transactor: Transactor[IO]) extends Subscriptions[IO] {
-  implicit def newTypePut[R, N](implicit ev: Coercible[Put[R], Put[N]], R: Put[R]): Put[N] = ev(R)
-  implicit def newTypeRead[R, N](implicit ev: Coercible[Read[R], Read[N]], R: Read[R]): Read[N] =
-    ev(R)
-
+final class JdbcSubscriptions private (transactor: Transactor[IO])
+    extends Subscriptions[IO]
+    with NewTypeMapping {
   override def subscribe(subscriber: Subscriber, subscription: TimelineSubscription): IO[Unit] =
     for {
       _ <- sql"""

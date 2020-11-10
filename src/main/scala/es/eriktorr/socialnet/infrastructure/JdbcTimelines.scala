@@ -8,13 +8,11 @@ import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
 import es.eriktorr.socialnet.domain.user._
-import io.estatico.newtype._
+import es.eriktorr.socialnet.infrastructure.jdbc.NewTypeMapping
 
-final class JdbcTimelines private (transactor: Transactor[IO]) extends Timelines[IO] {
-  implicit def newTypePut[R, N](implicit ev: Coercible[Put[R], Put[N]], R: Put[R]): Put[N] = ev(R)
-  implicit def newTypeRead[R, N](implicit ev: Coercible[Read[R], Read[N]], R: Read[R]): Read[N] =
-    ev(R)
-
+final class JdbcTimelines private (transactor: Transactor[IO])
+    extends Timelines[IO]
+    with NewTypeMapping {
   implicit val messageRead: Read[Message] =
     Read[(UserName, UserName, MessageBody)].map {
       case (sender, addressee, body) => Message(sender, addressee, body)
