@@ -31,8 +31,10 @@ object JdbcSubscriptionsSuite extends JdbcIOSuiteWithCheckers {
           val subscriptionsRepository = JdbcSubscriptions(transactor)
           for {
             _ <- subscriptions.traverse_(subscriptionsRepository.subscribe(subscriber, _))
-            result <- subscriptionsRepository.subscriptionsOf(subscriber)
-          } yield expect(result == subscriptions)
+            actual <- subscriptionsRepository.subscriptionsOf(subscriber)
+          } yield expect(
+            actual.sortWith(_ < _) == subscriptions.sortWith(_ < _)
+          )
         }
     }
   }

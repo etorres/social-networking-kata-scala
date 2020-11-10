@@ -6,7 +6,10 @@ import io.estatico.newtype.macros.newtype
 
 object subscription {
   @newtype case class Subscriber(unSubscriber: UserName)
-  @newtype case class TimelineSubscription(unTimelineSubscription: UserName)
+  @newtype case class TimelineSubscription(unTimelineSubscription: UserName) {
+    def <(other: TimelineSubscription): Boolean =
+      unTimelineSubscription.unUserName < other.unTimelineSubscription.unUserName
+  }
 
   object Subscriber {
     implicit val eqSubscriber: Eq[Subscriber] = Eq.fromUniversalEquals

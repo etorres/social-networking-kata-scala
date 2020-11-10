@@ -1,7 +1,5 @@
 package es.eriktorr.socialnet.application
 
-import java.time.LocalDateTime
-
 import cats._
 import cats.derived._
 import cats.implicits._
@@ -13,7 +11,7 @@ import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.Soci
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.withSocialNetworkContext
 import es.eriktorr.socialnet.shared.infrastructure.GeneratorSyntax._
 import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.{messageGen, userNameGen}
-import es.eriktorr.socialnet.shared.infrastructure.TimeGenerators._
+import es.eriktorr.socialnet.shared.infrastructure.TimeGenerators.timeMarkGen
 import org.scalacheck._
 import weaver._
 import weaver.scalacheck._
@@ -33,7 +31,7 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
     }
 
     val gen = (for {
-      initialTimeMark <- Arbitrary.arbitrary[LocalDateTime].map(a => TimeMark(a))
+      initialTimeMark <- timeMarkGen
       subscriber <- userNameGen
       otherUsers <- Gen.containerOfN[List, UserName](4, userNameGen)
       (subscribedTo, notSubscribedTo) = otherUsers.splitAt(2)
