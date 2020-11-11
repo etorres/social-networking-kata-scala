@@ -10,10 +10,20 @@ import es.eriktorr.socialnet.domain.user._
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 
+import scala.concurrent.ExecutionContext
+
 object SocialNetworkApp extends IOApp {
+  implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
+
+  override def contextShift: ContextShift[IO] = IO.contextShift(ec)
+  override def timer: Timer[IO] = IO.timer(ec)
+
   override def run(args: List[String]): IO[ExitCode] = {
     def programResource(config: SocialNetworkConfig): Resource[IO, SocialNetworkContext] =
-      SocialNetworkContext.impl(config)
+      for {
+        blocker <- Blocker[IO]
+        context <- SocialNetworkContext.impl(config)(ec, blocker, contextShift)
+      } yield context
 
     def program(logger: Logger[IO]): IO[ExitCode] =
       (for {

@@ -10,7 +10,7 @@ final class JdbcTransactor private (jdbcConfiguration: JdbcConfiguration)(
   blocker: Blocker,
   contextShift: ContextShift[IO]
 ) {
-  val transactor: Resource[IO, HikariTransactor[IO]] =
+  val transactorResource: Resource[IO, HikariTransactor[IO]] =
     for {
       xa <- HikariTransactor.newHikariTransactor[IO](
         jdbcConfiguration.driverClassName,

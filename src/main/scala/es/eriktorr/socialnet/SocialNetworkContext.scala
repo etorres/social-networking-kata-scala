@@ -10,7 +10,10 @@ import es.eriktorr.socialnet.application.{
 import es.eriktorr.socialnet.domain.subscription.Subscriptions
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
-import es.eriktorr.socialnet.effect._
+import es.eriktorr.socialnet.infrastructure.jdbc.JdbcTransactor
+import es.eriktorr.socialnet.infrastructure.{JdbcSubscriptions, JdbcTimelines}
+
+import scala.concurrent.ExecutionContext
 
 final class SocialNetworkContext(
   subscriptions: Subscriptions[IO],
@@ -26,6 +29,17 @@ final class SocialNetworkContext(
 }
 
 object SocialNetworkContext {
-  def impl(config: SocialNetworkConfig): Resource[IO, SocialNetworkContext] =
-    new SocialNetworkContext(???, LiveTimeMarker.impl[IO], ???).asResource
+  def impl(config: SocialNetworkConfig)(
+    implicit connectEc: ExecutionContext,
+    blocker: Blocker,
+    contextShift: ContextShift[IO]
+  ): Resource[IO, SocialNetworkContext] =
+    for {
+      transactor <- JdbcTransactor(config.jdbcConfiguration).transactorResource
+      context = new SocialNetworkContext(
+        JdbcSubscriptions(transactor),
+        LiveTimeMarker.impl[IO],
+        JdbcTimelines(transactor)
+      )
+    } yield context
 }

@@ -15,7 +15,7 @@ object JdbcTestTransactor {
     contextShift: ContextShift[IO]
   ): Resource[IO, HikariTransactor[IO]] =
     for {
-      transactor <- JdbcTransactor.apply(jdbcConfiguration).transactor
+      transactor <- JdbcTransactor.apply(jdbcConfiguration).transactorResource
       _ <- truncateAllTablesIn(transactor)
     } yield transactor
 

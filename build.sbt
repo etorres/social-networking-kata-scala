@@ -19,6 +19,7 @@ val kittensVersion = "2.2.0"
 val log4catsVersion = "1.1.1"
 val log4jVersion = "2.13.3"
 val newtypeVersion = "0.4.4"
+val pureconfigVersion = "0.14.0"
 val squantsVersion = "1.7.0"
 val weaverVersion = "0.5.0"
 
@@ -37,6 +38,7 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4jVersion,
   "io.chrisdavenport" %% "log4cats-slf4j" % log4catsVersion,
   "io.estatico" %% "newtype" % newtypeVersion,
+  "com.github.pureconfig" %% "pureconfig" % pureconfigVersion,
   "org.typelevel" %% "squants" % squantsVersion,
   "com.disneystreaming" %% "weaver-framework" % weaverVersion % Test,
   "com.disneystreaming" %% "weaver-scalacheck" % weaverVersion % Test
