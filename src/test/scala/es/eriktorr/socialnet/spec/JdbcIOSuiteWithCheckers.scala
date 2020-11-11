@@ -2,7 +2,7 @@ package es.eriktorr.socialnet.spec
 
 import cats.effect._
 import doobie._
-import es.eriktorr.socialnet.infrastructure.jdbc.JdbcTestTransactor
+import es.eriktorr.socialnet.infrastructure.jdbc.{JdbcMigrator, JdbcTestTransactor}
 import weaver._
 import weaver.scalacheck._
 

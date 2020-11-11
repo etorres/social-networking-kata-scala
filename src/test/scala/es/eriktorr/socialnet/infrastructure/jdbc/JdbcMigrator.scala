@@ -1,7 +1,6 @@
-package es.eriktorr.socialnet.spec
+package es.eriktorr.socialnet.infrastructure.jdbc
 
 import cats.effect._
-import es.eriktorr.socialnet.infrastructure.jdbc.JdbcConfiguration
 import org.flywaydb.core.Flyway
 
 trait JdbcMigrator[F[_]] {
