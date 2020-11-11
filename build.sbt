@@ -89,5 +89,3 @@ wartremoverErrors in (Compile, compile) ++= warts
 wartremoverErrors in (Test, compile) ++= warts
 
 testFrameworks += new TestFramework("weaver.framework.TestFramework")
-
-parallelExecution in Test := false

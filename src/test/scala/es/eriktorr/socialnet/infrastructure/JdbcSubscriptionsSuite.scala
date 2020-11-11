@@ -10,6 +10,8 @@ import es.eriktorr.socialnet.spec.JdbcIOSuiteWithCheckers
 import org.scalacheck._
 
 object JdbcSubscriptionsSuite extends JdbcIOSuiteWithCheckers {
+  override def currentSchema: String = "subscriptions"
+
   simpleTest("Write and read subscriptions from database") {
     final case class TestCase(subscriber: Subscriber, subscriptions: TimelineSubscriptions)
 
@@ -31,8 +33,9 @@ object JdbcSubscriptionsSuite extends JdbcIOSuiteWithCheckers {
           case (migrator, transactor) =>
             val subscriptionsRepository = JdbcSubscriptions(transactor)
             for {
-              _ <- migrator.migrate()
-              _ <- subscriptions.traverse_(subscriptionsRepository.subscribe(subscriber, _))
+              _ <- migrator.migrate() *> subscriptions.traverse_(
+                subscriptionsRepository.subscribe(subscriber, _)
+              )
               actual <- subscriptionsRepository.subscriptionsOf(subscriber)
             } yield expect(
               actual.sortWith(_ < _) == subscriptions.sortWith(_ < _)

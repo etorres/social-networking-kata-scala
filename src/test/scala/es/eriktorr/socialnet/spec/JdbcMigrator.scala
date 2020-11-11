@@ -11,10 +11,16 @@ trait JdbcMigrator[F[_]] {
 object JdbcMigrator {
   @SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
   def impl[F[_]: Sync: ContextShift](flyway: Flyway)(implicit blocker: Blocker): JdbcMigrator[F] =
-    () => blocker.delay(flyway.migrate())
+    () =>
+      blocker.delay {
+        flyway.clean()
+        flyway.baseline()
+        flyway.migrate()
+      }
 
-  def flywayResource[F[_]: Sync: ContextShift](
-    jdbcConfiguration: JdbcConfiguration
+  def migratorResource[F[_]: Sync: ContextShift](
+    jdbcConfiguration: JdbcConfiguration,
+    currentSchema: String
   )(implicit blocker: Blocker): Resource[F, JdbcMigrator[F]] = {
     val F = Sync[F]
     Resource.make(F.delay {
@@ -22,10 +28,12 @@ object JdbcMigrator {
         Flyway
           .configure()
           .dataSource(
-            jdbcConfiguration.connectUrl,
+            s"${jdbcConfiguration.connectUrl}?currentSchema=$currentSchema",
             jdbcConfiguration.user,
             jdbcConfiguration.password
           )
+          .defaultSchema(currentSchema)
+          .schemas(currentSchema)
           .load()
       }
     })(_ => F.unit)

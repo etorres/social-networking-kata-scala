@@ -15,6 +15,8 @@ import org.scalacheck._
 import org.scalacheck.cats.implicits._
 
 object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
+  override def currentSchema: String = "timelines"
+
   simpleTest("Write and read messages from database") {
     final case class TestCase(
       userName: UserName,
@@ -65,7 +67,7 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
           case (migrator, transactor) =>
             val timelines = JdbcTimelines(transactor)
             for {
-              _ <- allEvents.traverse_(timelines.save)
+              _ <- migrator.migrate() *> allEvents.traverse_(timelines.save)
               events <- timelines.readBy(NonEmptyList.of(userName))
             } yield expect(events == expectedEvents)
         }

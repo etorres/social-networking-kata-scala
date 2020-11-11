@@ -6,17 +6,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE USER social_network;
     CREATE DATABASE social_network;
     GRANT ALL PRIVILEGES ON DATABASE social_network TO social_network;
-    \c social_network
-    CREATE TABLE timeline_events (
-      id SERIAL PRIMARY KEY,
-      received_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-      sender VARCHAR(24) NOT NULL,
-      addressee VARCHAR(24) NOT NULL,
-      body VARCHAR(256) NOT NULL
-    );
-    CREATE TABLE subscriptions (
-      subscriber VARCHAR(24) NOT NULL,
-      subscription VARCHAR(24) NOT NULL,
-      PRIMARY KEY (subscriber, subscription)
-    );
 EOSQL
