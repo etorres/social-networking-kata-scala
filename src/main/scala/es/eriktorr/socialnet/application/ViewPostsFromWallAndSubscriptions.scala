@@ -1,5 +1,6 @@
 package es.eriktorr.socialnet.application
 
+import cats.data._
 import cats.effect._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.subscription._
@@ -19,7 +20,7 @@ object ViewPostsFromWallAndSubscriptions {
       for {
         userSubscriptions <- subscriptions.subscriptionsOf(Subscriber(userName))
         timelineEvents <- timelines.readBy(
-          userName :: userSubscriptions.map(_.unTimelineSubscription): _*
+          NonEmptyList.ofInitLast(userSubscriptions.map(_.unTimelineSubscription), userName)
         )
       } yield timelineEvents
 }

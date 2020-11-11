@@ -1,6 +1,7 @@
 package es.eriktorr.socialnet.domain
 
 import cats._
+import cats.data._
 import cats.derived._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
@@ -20,7 +21,7 @@ object timeline {
   type TimelineEvents = List[TimelineEvent]
 
   trait Timelines[F[_]] {
-    def readBy(userNames: UserName*): F[TimelineEvents]
+    def readBy(userNames: NonEmptyList[UserName]): F[TimelineEvents]
     def save(event: TimelineEvent): F[Unit]
   }
 }

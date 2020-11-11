@@ -1,5 +1,6 @@
 package es.eriktorr.socialnet.infrastructure
 
+import cats.data._
 import cats.effect._
 import doobie._
 import doobie.implicits._
@@ -23,19 +24,17 @@ final class JdbcTimelines private (transactor: Transactor[IO])
       case (timeMark, message) => TimelineEvent(timeMark, message)
     }
 
-  override def readBy(userNames: UserName*): IO[TimelineEvents] =
+  override def readBy(userNames: NonEmptyList[UserName]): IO[TimelineEvents] =
     for {
-      events <- sql"""
+      events <- (fr"""
         SELECT
           received_at AS markTime,
           sender,
           addressee,
           body
         FROM timeline_events
-        WHERE
-          addressee IN (${userNames.mkString(",")})
-        ORDER BY received_at DESC
-        LIMIT 100"""
+        WHERE""" ++ Fragments.in(fr"addressee", userNames)
+        ++ fr"ORDER BY received_at DESC LIMIT 100")
         .query[TimelineEvent]
         .to[List]
         .transact(transactor)

@@ -1,6 +1,7 @@
 package es.eriktorr.socialnet.infrastructure
 
 import cats._
+import cats.data._
 import cats.derived._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.message._
@@ -64,7 +65,7 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
           val timelines = JdbcTimelines(transactor)
           for {
             _ <- allEvents.traverse_(timelines.save)
-            events <- timelines.readBy(userName)
+            events <- timelines.readBy(NonEmptyList.of(userName))
           } yield expect(events == expectedEvents)
         }
     }
