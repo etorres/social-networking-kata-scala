@@ -46,10 +46,10 @@ final class JdbcTimelines private (transactor: Transactor[IO])
         INSERT INTO 
           timeline_events (received_at, sender, addressee, body) 
         VALUES (
-          ${event.timeMark.unTimeMark}, 
-          ${event.message.sender.unUserName},
-          ${event.message.addressee.unUserName},
-          ${event.message.body.unBody}
+          ${event.timeMark}, 
+          ${event.message.sender},
+          ${event.message.addressee},
+          ${event.message.body}
         )
         """.update.run.transact(transactor)
     } yield ()
