@@ -61,12 +61,13 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
 
     forall(gen) {
       case TestCase(userName, allEvents, expectedEvents) =>
-        testResources.use { transactor =>
-          val timelines = JdbcTimelines(transactor)
-          for {
-            _ <- allEvents.traverse_(timelines.save)
-            events <- timelines.readBy(NonEmptyList.of(userName))
-          } yield expect(events == expectedEvents)
+        testResources.use {
+          case (migrator, transactor) =>
+            val timelines = JdbcTimelines(transactor)
+            for {
+              _ <- allEvents.traverse_(timelines.save)
+              events <- timelines.readBy(NonEmptyList.of(userName))
+            } yield expect(events == expectedEvents)
         }
     }
   }

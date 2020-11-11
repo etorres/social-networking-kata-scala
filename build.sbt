@@ -16,6 +16,7 @@ val catsScalacheckVersion = "0.3.0"
 val console4catsVersion = "0.8.1"
 val doobieVersion = "0.9.2"
 val kittensVersion = "2.2.0"
+val flywayVersion = "7.2.0"
 val log4catsVersion = "1.1.1"
 val log4jVersion = "2.13.3"
 val newtypeVersion = "0.4.4"
@@ -32,6 +33,7 @@ libraryDependencies ++= Seq(
   "dev.profunktor" %% "console4cats" % console4catsVersion,
   "org.tpolecat" %% "doobie-hikari" % doobieVersion,
   "org.tpolecat" %% "doobie-postgres" % doobieVersion,
+  "org.flywaydb" % "flyway-core" % flywayVersion % Test,
   "org.typelevel" %% "kittens" % kittensVersion,
   "io.chrisdavenport" %% "log4cats-core" % log4catsVersion,
   "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
