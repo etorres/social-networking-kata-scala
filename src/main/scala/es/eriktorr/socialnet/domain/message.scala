@@ -9,7 +9,14 @@ import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
 object message {
+  @newtype case class Addressee(unAddressee: UserName)
   @newtype class MessageBody(val unBody: String)
+  @newtype case class Sender(unSender: UserName)
+
+  object Addressee {
+    implicit val eqAddressee: Eq[Addressee] = Eq.fromUniversalEquals
+    implicit val showAddressee: Show[Addressee] = Show.show(_.toString)
+  }
 
   object MessageBody {
     def fromString(str: String): Either[InvalidParameter, MessageBody] =
@@ -20,7 +27,12 @@ object message {
     implicit val showMessageBody: Show[MessageBody] = Show.show(_.toString)
   }
 
-  final case class Message(sender: UserName, addressee: UserName, body: MessageBody)
+  object Sender {
+    implicit val eqSender: Eq[Sender] = Eq.fromUniversalEquals
+    implicit val showSender: Show[Sender] = Show.show(_.toString)
+  }
+
+  final case class Message(sender: Sender, addressee: Addressee, body: MessageBody)
 
   type Messages = List[Message]
 

@@ -37,6 +37,6 @@ object SocialNetworkGenerators {
     addresseeGen: Gen[UserName] = userNameGen
   ): Gen[Message] =
     (senderGen, addresseeGen, messageBodyGen).tupled.map {
-      case (sender, addressee, body) => Message(sender, addressee, body)
+      case (sender, addressee, body) => Message(Sender(sender), Addressee(addressee), body)
     }
 }

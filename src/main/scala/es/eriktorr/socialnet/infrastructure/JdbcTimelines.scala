@@ -15,7 +15,7 @@ final class JdbcTimelines private (transactor: Transactor[IO])
     extends Timelines[IO]
     with NewTypeMapping {
   implicit val messageRead: Read[Message] =
-    Read[(UserName, UserName, MessageBody)].map {
+    Read[(Sender, Addressee, MessageBody)].map {
       case (sender, addressee, body) => Message(sender, addressee, body)
     }
 

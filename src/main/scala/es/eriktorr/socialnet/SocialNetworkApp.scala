@@ -40,7 +40,7 @@ object SocialNetworkApp extends IOApp {
           case PostCommand(addressee, messageBody) =>
             programResource(config).use(
               _.postMessageToPersonalTimeline
-                .post(Message(userName, addressee, messageBody))
+                .post(Message(Sender(userName), Addressee(addressee), messageBody))
             )
         }).as(ExitCode.Success)
       } yield result)
