@@ -20,7 +20,7 @@ object JdbcConfiguration {
 
   def fromConfiguration: Either[ConfigurationReadError, JdbcConfiguration] =
     ConfigSource.default.at("jdbc").load[JdbcConfiguration] match {
-      case Left(error) => ConfigurationReadError(error.prettyPrint()).asLeft
+      case Left(error) => ConfigurationReadError(error.toString).asLeft
       case Right(config) => config.asRight
     }
 }
