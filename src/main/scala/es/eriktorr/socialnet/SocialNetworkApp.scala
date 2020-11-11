@@ -33,7 +33,13 @@ object SocialNetworkApp extends IOApp {
         name <- readLn
         userName <- IO.fromEither(UserName.fromString(name))
         _ <- putStrLn(s"Hi $name, now you can post to someone's timeline:")
-        _ <- putStrLn(s"<her/his name> -> <message>")
+        _ <- putStrLn("  Jane *> Hi there!")
+        _ <- putStrLn("View someone's timeline:")
+        _ <- putStrLn("  <* Jane")
+        _ <- putStrLn("Follow your favourite person:")
+        _ <- putStrLn("  ^^ Jane")
+        _ <- putStrLn("And finally, view all your content in the same place:")
+        _ <- putStrLn("  <*>")
         request <- readLn
         command <- IO.fromEither(Command.fromString(request))
         result <- (command match {
