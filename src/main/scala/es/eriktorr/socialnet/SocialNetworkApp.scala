@@ -35,17 +35,14 @@ object SocialNetworkApp extends IOApp {
         _ <- putStrLn(s"Hi $name, now you can post to someone's timeline:")
         _ <- putStrLn(s"<her/his name> -> <message>")
         request <- readLn
-        command = Command.fromString(request)
-        result <- IO
-          .fromEither(command)
-          .map {
-            case PostCommand(to, messageBody) =>
-              programResource(config).use(
-                _.postMessageToPersonalTimeline
-                  .post(Message(userName, to, messageBody))
-              )
-          }
-          .as(ExitCode.Success)
+        command <- IO.fromEither(Command.fromString(request))
+        result <- (command match {
+          case PostCommand(addressee, messageBody) =>
+            programResource(config).use(
+              _.postMessageToPersonalTimeline
+                .post(Message(userName, addressee, messageBody))
+            )
+        }).as(ExitCode.Success)
       } yield result)
         .onError {
           case e: RequestError => logger.error(e)(e.getMessage)
