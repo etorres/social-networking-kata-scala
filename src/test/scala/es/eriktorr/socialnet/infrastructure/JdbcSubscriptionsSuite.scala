@@ -10,7 +10,7 @@ import es.eriktorr.socialnet.spec.JdbcIOSuiteWithCheckers
 import org.scalacheck._
 
 object JdbcSubscriptionsSuite extends JdbcIOSuiteWithCheckers {
-  override def currentSchema: String = "subscriptions"
+  override def currentSchema: String = "test_subscriptions"
 
   simpleTest("Write and read subscriptions from database") {
     final case class TestCase(subscriber: Subscriber, subscriptions: TimelineSubscriptions)

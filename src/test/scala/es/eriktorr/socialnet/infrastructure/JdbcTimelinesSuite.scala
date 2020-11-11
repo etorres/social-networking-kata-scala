@@ -15,7 +15,7 @@ import org.scalacheck._
 import org.scalacheck.cats.implicits._
 
 object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
-  override def currentSchema: String = "timelines"
+  override def currentSchema: String = "test_timelines"
 
   simpleTest("Write and read messages from database") {
     final case class TestCase(
