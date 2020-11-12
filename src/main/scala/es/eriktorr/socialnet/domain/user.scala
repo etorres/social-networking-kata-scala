@@ -4,6 +4,7 @@ import cats._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.error._
 import io.estatico.newtype.macros.newtype
+import io.estatico.newtype.ops._
 
 object user {
   @newtype class UserName[A <: UserName.UserType](val unUserName: String) {
@@ -11,8 +12,7 @@ object user {
 
     def <(other: UserName[A]): Boolean = unUserName < other.unUserName
 
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def asUserName[B <: UserName.UserType]: UserName[B] = unUserName.asInstanceOf[UserName[B]]
+    def asUserName[B <: UserName.UserType]: UserName[B] = unUserName.coerce[UserName[B]]
   }
 
   object UserName {
@@ -25,10 +25,13 @@ object user {
       sealed trait Sender extends UserType
     }
 
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    // TODO: this only needed for IntelliJ to compile
+    implicit def ev[A <: UserName.UserType, B]: io.estatico.newtype.Coercible[B, UserName[A]] =
+      io.estatico.newtype.Coercible.instance[B, UserName[A]]
+
     def fromString[A <: UserName.UserType](str: String): Either[InvalidParameter, UserName[A]] =
       if (str.isBlank) InvalidParameter("User name cannot be empty").asLeft
-      else str.trim.asInstanceOf[UserName[A]].asRight
+      else str.trim.coerce[UserName[A]].asRight
   }
 
   implicit def eqUserName[A <: UserName.UserType]: Eq[UserName[A]] = Eq.fromUniversalEquals
