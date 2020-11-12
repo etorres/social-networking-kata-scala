@@ -6,8 +6,10 @@ import cats.effect._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import es.eriktorr.socialnet.domain.subscription._
+import es.eriktorr.socialnet.domain.user._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 
-final case class SubscriptionsState(subscriptions: UsersSubscriptions)
+final case class SubscriptionsState(subscriptions: FolloweesPerUser)
 
 object SubscriptionsState {
   implicit val eqSubscriptionsState: Eq[SubscriptionsState] = semiauto.eq
@@ -16,18 +18,18 @@ object SubscriptionsState {
 final class FakeSubscriptions[F[_]: Sync] private[infrastructure] (
   val ref: Ref[F, SubscriptionsState]
 ) extends Subscriptions[F] {
-  override def subscribe(subscriber: Subscriber, subscription: TimelineSubscription): F[Unit] =
+  override def follow(follower: UserName[Follower], followee: UserName[Followee]): F[Unit] =
     ref.get.flatMap(current =>
       ref.set {
         current.copy(
-          current.subscriptions + (subscriber -> (subscription :: current.subscriptions
-            .getOrElse(subscriber, List.empty)))
+          current.subscriptions + (follower -> (followee :: current.subscriptions
+            .getOrElse(follower, List.empty)))
         )
       }
     )
 
-  override def subscriptionsOf(subscriber: Subscriber): F[TimelineSubscriptions] =
-    ref.get.map(_.subscriptions.getOrElse(subscriber, List.empty))
+  override def followeesOf(follower: UserName[Follower]): F[Followees] =
+    ref.get.map(_.subscriptions.getOrElse(follower, List.empty))
 }
 
 object FakeSubscriptions {

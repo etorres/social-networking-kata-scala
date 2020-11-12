@@ -2,15 +2,15 @@ package es.eriktorr.socialnet.application
 
 import cats.data._
 import cats.effect._
-import cats.implicits._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 
 trait ViewPostsFromTimeline[F[_]] {
-  def viewPostsBy(userName: UserName): F[TimelineEvents]
+  def viewPostsBy(addressee: UserName[Addressee]): F[TimelineEvents]
 }
 
 object ViewPostsFromTimeline {
   def impl[F[_]: Sync](timelines: Timelines[F]): ViewPostsFromTimeline[F] =
-    (userName: UserName) => timelines.readBy(NonEmptyList.of(userName)).map(identity)
+    (addressee: UserName[Addressee]) => timelines.readBy(NonEmptyList.of(addressee))
 }

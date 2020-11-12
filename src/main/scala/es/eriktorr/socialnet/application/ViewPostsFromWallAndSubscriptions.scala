@@ -5,10 +5,11 @@ import cats.effect._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.subscription._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 
 trait ViewPostsFromWallAndSubscriptions[F[_]] {
-  def viewAllPostsFor(userName: UserName): F[TimelineEvents]
+  def viewAllPostsFor(addressee: UserName[Addressee]): F[TimelineEvents]
 }
 
 object ViewPostsFromWallAndSubscriptions {
@@ -16,11 +17,11 @@ object ViewPostsFromWallAndSubscriptions {
     timelines: Timelines[F],
     subscriptions: Subscriptions[F]
   ): ViewPostsFromWallAndSubscriptions[F] =
-    (userName: UserName) =>
+    (addressee: UserName[Addressee]) =>
       for {
-        userSubscriptions <- subscriptions.subscriptionsOf(Subscriber(userName))
+        followees <- subscriptions.followeesOf(addressee.asUserName[Follower])
         timelineEvents <- timelines.readBy(
-          NonEmptyList.ofInitLast(userSubscriptions.map(_.unTimelineSubscription), userName)
+          NonEmptyList.ofInitLast(followees.map(_.asUserName[Addressee]), addressee)
         )
       } yield timelineEvents
 }

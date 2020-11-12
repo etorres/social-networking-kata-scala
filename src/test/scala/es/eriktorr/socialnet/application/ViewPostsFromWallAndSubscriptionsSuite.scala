@@ -6,6 +6,7 @@ import cats.implicits._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.subscription._
 import es.eriktorr.socialnet.domain.time._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.SocialNetworkState.initialStateFrom
 import es.eriktorr.socialnet.shared.infrastructure.FakeSocialNetworkContext.withSocialNetworkContext
@@ -20,10 +21,10 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
   simpleTest("Subscribe to timelines, and view an aggregated list of all subscriptions") {
     final case class TestCase(
       initialTimeMark: TimeMark,
-      subscriber: UserName,
-      subscribedTo: List[UserName],
-      allMessages: List[Message],
-      wallAndSubscriptionMessages: List[Message]
+      follower: UserName[Follower],
+      followees: Followees,
+      allMessages: Messages,
+      wallAndSubscriptionMessages: Messages
     )
 
     object TestCase {
@@ -32,28 +33,34 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
 
     val gen = (for {
       initialTimeMark <- timeMarkGen
-      subscriber <- userNameGen
-      otherUsers <- Gen.containerOfN[List, UserName](4, userNameGen)
-      (subscribedTo, notSubscribedTo) = otherUsers.splitAt(2)
-      allUsers = subscriber :: (subscribedTo ++ notSubscribedTo)
+      follower <- userNameGen[Follower]
+      otherUsers <- Gen.containerOfN[List, UserName[Followee]](4, userNameGen[Followee])
+      (followees, notFollowees) = otherUsers.splitAt(2)
+      allUsers = (follower :: (followees ++ notFollowees)).map(_.asUserName[Sender])
       wallMessages <- Gen.containerOf[List, Message](
-        messageGen(senderGen = Gen.oneOf(allUsers), addresseeGen = Gen.const(subscriber))
+        messageGen(
+          senderGen = Gen.oneOf(allUsers),
+          addresseeGen = Gen.const(follower.asUserName[Addressee])
+        )
       )
       subscribedWalls <- Gen.containerOf[List, Message](
-        messageGen(senderGen = Gen.oneOf(allUsers), addresseeGen = Gen.oneOf(subscribedTo))
+        messageGen(
+          senderGen = Gen.oneOf(allUsers),
+          addresseeGen = Gen.oneOf(followees.map(_.asUserName[Addressee]))
+        )
       )
       notSubscribedWalls <- Gen.containerOf[List, Message](
         messageGen(
           senderGen = Gen.oneOf(allUsers),
-          addresseeGen = Gen.oneOf(notSubscribedTo)
+          addresseeGen = Gen.oneOf(notFollowees.map(_.asUserName[Addressee]))
         )
       )
       wallAndSubscriptionMessages = wallMessages ++ subscribedWalls
       allMessages = wallAndSubscriptionMessages ++ notSubscribedWalls
     } yield TestCase(
       initialTimeMark,
-      subscriber,
-      subscribedTo,
+      follower,
+      followees,
       allMessages,
       wallAndSubscriptionMessages
     )).sampleWithSeed("ViewPostsFromWallAndSubscriptionsSuite")
@@ -61,8 +68,8 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
     forall(gen) {
       case TestCase(
           initialTimeMark,
-          subscriber,
-          subscribedTo,
+          follower,
+          followees,
           allMessages,
           wallAndSubscriptionMessages
           ) =>
@@ -70,10 +77,10 @@ object ViewPostsFromWallAndSubscriptionsSuite extends SimpleIOSuite with IOCheck
           initialStateFrom(
             initialTimeMark,
             allMessages,
-            Map(Subscriber(subscriber) -> subscribedTo.map(a => TimelineSubscription(a)))
+            Map(follower -> followees)
           )
         withSocialNetworkContext(initialState)(
-          _.viewPostsFromAllSubscriptions.viewAllPostsFor(subscriber)
+          _.viewPostsFromAllSubscriptions.viewAllPostsFor(follower.asUserName[Addressee])
         ) map {
           case (finalState, testResult) =>
             expect(testResult === finalState.timelinesState.events.filter { e =>
