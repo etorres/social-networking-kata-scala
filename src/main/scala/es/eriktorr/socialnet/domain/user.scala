@@ -5,15 +5,17 @@ import cats.implicits._
 import es.eriktorr.socialnet.domain.error._
 import es.eriktorr.socialnet.effect._
 import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.predicates.all._
+import io.estatico.newtype.Coercible
 import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
 object user {
-  @newtype class UserName[A <: UserName.UserType](val unUserName: String) {
-    def mkString(separator: String): String = unUserName.mkString(separator)
+  @newtype class UserName[A <: UserName.UserType](val unUserName: NonBlankString) {
+    def mkString(separator: String): String = unUserName.value.mkString(separator)
 
-    def <(other: UserName[A]): Boolean = unUserName < other.unUserName
+    def <(other: UserName[A]): Boolean = unUserName.value < other.unUserName.value
 
     def asUserName[B <: UserName.UserType]: UserName[B] = unUserName.coerce[UserName[B]]
   }
@@ -29,13 +31,17 @@ object user {
     }
 
     // TODO: this only needed for IntelliJ to compile
-    implicit def ev[A <: UserName.UserType, B]: io.estatico.newtype.Coercible[B, UserName[A]] =
-      io.estatico.newtype.Coercible.instance[B, UserName[A]]
+    implicit def ev2[A <: UserName.UserType, B]: Coercible[B, UserName[A]] =
+      Coercible.instance[B, UserName[A]]
+
+    implicit def ev[A <: UserName.UserType]
+      : Coercible[String Refined MatchesRegex[NonBlank], UserName[A]] =
+      Coercible.instance[String Refined MatchesRegex[NonBlank], UserName[A]]
 
     def fromString[A <: UserName.UserType](str: String): Either[InvalidParameter, UserName[A]] =
       refineV[MatchesRegex[NonBlank]](str) match {
         case Left(_) => InvalidParameter("User name cannot be blank or empty").asLeft
-        case Right(refinedStr) => refinedStr.value.trim.coerce[UserName[A]].asRight
+        case Right(refinedStr) => refinedStr.coerce[UserName[A]].asRight
       }
   }
 

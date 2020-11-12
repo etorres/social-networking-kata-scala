@@ -13,13 +13,13 @@ import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
 object message {
-  @newtype class MessageBody(val unBody: String)
+  @newtype class MessageBody(val unBody: NonBlankString)
 
   object MessageBody {
     def fromString(str: String): Either[InvalidParameter, MessageBody] =
       refineV[MatchesRegex[NonBlank]](str) match {
         case Left(_) => InvalidParameter("Message body cannot be blank or empty").asLeft
-        case Right(refinedStr) => refinedStr.value.trim.coerce.asRight
+        case Right(refinedStr) => refinedStr.coerce[MessageBody].asRight
       }
 
     implicit val eqMessageBody: Eq[MessageBody] = Eq.fromUniversalEquals
