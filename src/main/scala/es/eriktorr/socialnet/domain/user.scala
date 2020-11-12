@@ -3,6 +3,9 @@ package es.eriktorr.socialnet.domain
 import cats._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.error._
+import es.eriktorr.socialnet.effect._
+import eu.timepit.refined._
+import eu.timepit.refined.predicates.all._
 import io.estatico.newtype.macros.newtype
 import io.estatico.newtype.ops._
 
@@ -30,8 +33,10 @@ object user {
       io.estatico.newtype.Coercible.instance[B, UserName[A]]
 
     def fromString[A <: UserName.UserType](str: String): Either[InvalidParameter, UserName[A]] =
-      if (str.isBlank) InvalidParameter("User name cannot be empty").asLeft
-      else str.trim.coerce[UserName[A]].asRight
+      refineV[MatchesRegex[NonBlank]](str) match {
+        case Left(_) => InvalidParameter("User name cannot be blank or empty").asLeft
+        case Right(refinedStr) => refinedStr.value.trim.coerce[UserName[A]].asRight
+      }
   }
 
   implicit def eqUserName[A <: UserName.UserType]: Eq[UserName[A]] = Eq.fromUniversalEquals
