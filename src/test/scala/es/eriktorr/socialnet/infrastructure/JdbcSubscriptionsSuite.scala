@@ -28,17 +28,16 @@ object JdbcSubscriptionsSuite extends JdbcIOSuiteWithCheckers {
 
     forall(gen) {
       case TestCase(subscriber, subscriptions) =>
-        testResources.use {
-          case (migrator, transactor) =>
-            val subscriptionsRepository = JdbcSubscriptions(transactor)
-            for {
-              _ <- migrator.migrate() *> subscriptions.traverse_(
-                subscriptionsRepository.follow(subscriber, _)
-              )
-              actual <- subscriptionsRepository.followeesOf(subscriber)
-            } yield expect(
-              actual.sortWith(_ < _) == subscriptions.sortWith(_ < _)
+        testResources.use { transactor =>
+          val subscriptionsRepository = JdbcSubscriptions(transactor)
+          for {
+            _ <- subscriptions.traverse_(
+              subscriptionsRepository.follow(subscriber, _)
             )
+            actual <- subscriptionsRepository.followeesOf(subscriber)
+          } yield expect(
+            actual.sortWith(_ < _) == subscriptions.sortWith(_ < _)
+          )
         }
     }
   }

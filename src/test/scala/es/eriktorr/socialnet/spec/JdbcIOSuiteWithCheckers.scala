@@ -2,7 +2,7 @@ package es.eriktorr.socialnet.spec
 
 import cats.effect._
 import doobie._
-import es.eriktorr.socialnet.infrastructure.jdbc.{JdbcMigrator, JdbcTestTransactor}
+import es.eriktorr.socialnet.infrastructure.jdbc.JdbcTestTransactor
 import weaver._
 import weaver.scalacheck._
 
@@ -18,12 +18,8 @@ trait JdbcIOSuiteWithCheckers extends SimpleIOSuite with IOCheckers {
 
   def currentSchema: String
 
-  val testResources: Resource[IO, (JdbcMigrator[IO], Transactor[IO])] = for {
-    migrator <- JdbcMigrator
-      .migratorResource[IO](JdbcTestTransactor.socialNetworkJdbcConfig, currentSchema)
-    transactor <- JdbcTestTransactor.testTransactorResource(
-      JdbcTestTransactor.socialNetworkJdbcConfig,
-      currentSchema
-    )
-  } yield (migrator, transactor)
+  val testResources: Resource[IO, Transactor[IO]] = JdbcTestTransactor.testTransactorResource(
+    JdbcTestTransactor.socialNetworkJdbcConfig,
+    currentSchema
+  )
 }

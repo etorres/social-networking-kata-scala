@@ -34,7 +34,6 @@ libraryDependencies ++= Seq(
   "dev.profunktor" %% "console4cats" % console4catsVersion,
   "org.tpolecat" %% "doobie-hikari" % doobieVersion,
   "org.tpolecat" %% "doobie-postgres" % doobieVersion,
-  "org.flywaydb" % "flyway-core" % flywayVersion % Test,
   "org.typelevel" %% "kittens" % kittensVersion,
   "io.chrisdavenport" %% "log4cats-core" % log4catsVersion,
   "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
