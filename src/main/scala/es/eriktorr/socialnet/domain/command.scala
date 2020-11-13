@@ -15,7 +15,7 @@ object command {
       extends Command
 
   object Command {
-    val posting: Regex = "(.+) -> (.+)".r
+    val posting: Regex = "(.+) \\*> (.+)".r
 
     def fromString(input: String): Either[RequestError, Command] = input match {
       case posting(user, message) =>
