@@ -44,7 +44,7 @@ object JdbcTestTransactor {
   def socialNetworkJdbcConfig: JdbcConfiguration =
     JdbcConfiguration.postgres(
       connectUrl = "jdbc:postgresql://localhost:5432/social_network",
-      user = "postgres",
-      password = "s3c4Et"
+      user = "social_network",
+      password = "changeme"
     )
 }

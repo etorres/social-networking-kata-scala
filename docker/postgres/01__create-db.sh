@@ -3,10 +3,10 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE USER social_network;
+    CREATE USER social_network WITH PASSWORD 'changeme';
     CREATE DATABASE social_network;
     GRANT ALL PRIVILEGES ON DATABASE social_network TO social_network;
-    \connect social_network
+    \connect social_network social_network
     DO \$\$
     DECLARE
       schema_names TEXT[] := ARRAY['public', 'test_subscriptions','test_timelines'];
