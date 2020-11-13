@@ -16,6 +16,10 @@ trait JdbcIOSuiteWithCheckers extends SimpleIOSuite with IOCheckers {
   override def checkConfig: CheckConfig =
     super.checkConfig.copy(minimumSuccessful = 10, perPropertyParallelism = 1)
 
-  val testResources: Resource[IO, Transactor[IO]] =
-    JdbcTestTransactor.testTransactorResource(JdbcTestTransactor.socialNetworkJdbcConfig)
+  def currentSchema: String
+
+  val testResources: Resource[IO, Transactor[IO]] = JdbcTestTransactor.testTransactorResource(
+    JdbcTestTransactor.socialNetworkJdbcConfig,
+    currentSchema
+  )
 }

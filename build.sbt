@@ -16,10 +16,12 @@ val catsScalacheckVersion = "0.3.0"
 val console4catsVersion = "0.8.1"
 val doobieVersion = "0.9.2"
 val kittensVersion = "2.2.0"
+val flywayVersion = "7.2.0"
 val log4catsVersion = "1.1.1"
 val log4jVersion = "2.13.3"
 val newtypeVersion = "0.4.4"
 val pureconfigVersion = "0.14.0"
+val refinedVersion = "0.9.17"
 val squantsVersion = "1.7.0"
 val weaverVersion = "0.5.0"
 
@@ -39,6 +41,8 @@ libraryDependencies ++= Seq(
   "io.chrisdavenport" %% "log4cats-slf4j" % log4catsVersion,
   "io.estatico" %% "newtype" % newtypeVersion,
   "com.github.pureconfig" %% "pureconfig" % pureconfigVersion,
+  "eu.timepit" %% "refined" % refinedVersion,
+  "eu.timepit" %% "refined-scalacheck" % refinedVersion % Test,
   "org.typelevel" %% "squants" % squantsVersion,
   "com.disneystreaming" %% "weaver-framework" % weaverVersion % Test,
   "com.disneystreaming" %% "weaver-scalacheck" % weaverVersion % Test
@@ -87,5 +91,3 @@ wartremoverErrors in (Compile, compile) ++= warts
 wartremoverErrors in (Test, compile) ++= warts
 
 testFrameworks += new TestFramework("weaver.framework.TestFramework")
-
-parallelExecution in Test := false

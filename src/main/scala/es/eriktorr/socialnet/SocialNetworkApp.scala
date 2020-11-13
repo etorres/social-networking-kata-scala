@@ -6,6 +6,7 @@ import cats.implicits._
 import es.eriktorr.socialnet.domain.command._
 import es.eriktorr.socialnet.domain.error._
 import es.eriktorr.socialnet.domain.message._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
@@ -31,16 +32,22 @@ object SocialNetworkApp extends IOApp {
         _ <- putStrLn("Welcome to yet another social network!")
         _ <- putStrLn("Please enter your name: ")
         name <- readLn
-        userName <- IO.fromEither(UserName.fromString(name))
+        userName <- IO.fromEither(UserName.fromString[Sender](name))
         _ <- putStrLn(s"Hi $name, now you can post to someone's timeline:")
-        _ <- putStrLn(s"<her/his name> -> <message>")
+        _ <- putStrLn("  Jane *> Hi there!")
+        _ <- putStrLn("View someone's timeline:")
+        _ <- putStrLn("  <* Jane")
+        _ <- putStrLn("Follow your favourite person:")
+        _ <- putStrLn("  ^^ Jane")
+        _ <- putStrLn("And finally, view all your content in the same place:")
+        _ <- putStrLn("  <*>")
         request <- readLn
         command <- IO.fromEither(Command.fromString(request))
         result <- (command match {
           case PostCommand(addressee, messageBody) =>
             programResource(config).use(
               _.postMessageToPersonalTimeline
-                .post(Message(userName, addressee, messageBody))
+                .post(Message(userName, addressee.asUserName[Addressee], messageBody))
             )
         }).as(ExitCode.Success)
       } yield result)

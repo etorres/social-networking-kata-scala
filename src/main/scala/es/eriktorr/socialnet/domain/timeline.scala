@@ -5,6 +5,7 @@ import cats.data._
 import cats.derived._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 
 object timeline {
@@ -21,7 +22,7 @@ object timeline {
   type TimelineEvents = List[TimelineEvent]
 
   trait Timelines[F[_]] {
-    def readBy(userNames: NonEmptyList[UserName]): F[TimelineEvents]
+    def readBy(addressees: NonEmptyList[UserName[Addressee]]): F[TimelineEvents]
     def save(event: TimelineEvent): F[Unit]
   }
 }

@@ -9,23 +9,31 @@ import doobie.implicits._
 import scala.concurrent.ExecutionContext
 
 object JdbcTestTransactor {
-  def testTransactorResource(jdbcConfiguration: JdbcConfiguration)(
+  def testTransactorResource(jdbcConfiguration: JdbcConfiguration, currentSchema: String)(
     implicit connectEc: ExecutionContext,
     blocker: Blocker,
     contextShift: ContextShift[IO]
   ): Resource[IO, HikariTransactor[IO]] =
     for {
-      transactor <- JdbcTransactor.apply(jdbcConfiguration).transactorResource
-      _ <- truncateAllTablesIn(transactor)
+      transactor <- JdbcTransactor
+        .apply(
+          jdbcConfiguration
+            .copy(connectUrl = s"${jdbcConfiguration.connectUrl}?currentSchema=$currentSchema")
+        )
+        .transactorResource
+      _ <- truncateAllTablesIn(transactor, currentSchema)
     } yield transactor
 
-  private[this] def truncateAllTablesIn(transactor: Transactor[IO]): Resource[IO, Unit] =
+  private[this] def truncateAllTablesIn(
+    transactor: Transactor[IO],
+    currentSchema: String
+  ): Resource[IO, Unit] =
     Resource.make {
       (for {
         tableNames <- sql"""
           SELECT table_name
           FROM information_schema.tables
-          WHERE table_schema = 'public'
+          WHERE table_schema = $currentSchema
           ORDER BY table_name""".query[String].to[List]
         _ <- tableNames
           .map(tableName => Fragment.const(s"truncate table $tableName"))
@@ -36,7 +44,7 @@ object JdbcTestTransactor {
   def socialNetworkJdbcConfig: JdbcConfiguration =
     JdbcConfiguration.postgres(
       connectUrl = "jdbc:postgresql://localhost:5432/social_network",
-      user = "postgres",
-      password = "s3c4Et"
+      user = "social_network",
+      password = "changeme"
     )
 }

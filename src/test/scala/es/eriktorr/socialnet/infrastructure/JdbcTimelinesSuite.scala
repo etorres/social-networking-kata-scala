@@ -6,6 +6,7 @@ import cats.derived._
 import cats.implicits._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 import es.eriktorr.socialnet.shared.infrastructure.GeneratorSyntax._
 import es.eriktorr.socialnet.shared.infrastructure.SocialNetworkGenerators.{messageGen, userNameGen}
@@ -15,9 +16,11 @@ import org.scalacheck._
 import org.scalacheck.cats.implicits._
 
 object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
+  override def currentSchema: String = "test_timelines"
+
   simpleTest("Write and read messages from database") {
     final case class TestCase(
-      userName: UserName,
+      addressee: UserName[Addressee],
       allEvents: TimelineEvents,
       expectedEvents: TimelineEvents
     )
@@ -28,10 +31,10 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
 
     val gen = (for {
       (targetUserName, otherUserNames) <- (
-        userNameGen,
-        Gen.containerOfN[List, UserName](3, userNameGen)
+        userNameGen[Addressee],
+        Gen.containerOfN[List, UserName[Sender]](3, userNameGen[Sender])
       ).tupled
-      allUserNames = targetUserName :: otherUserNames
+      allUserNames = targetUserName.asUserName[Sender] :: otherUserNames
       (targetMessages, otherMessages) <- (
         Gen.containerOfN[List, Message](
           3,
@@ -44,7 +47,7 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
           5,
           messageGen(
             senderGen = Gen.oneOf(allUserNames),
-            addresseeGen = Gen.oneOf(otherUserNames)
+            addresseeGen = Gen.oneOf(otherUserNames.map(_.asUserName[Addressee]))
           )
         )
       ).tupled
@@ -60,12 +63,12 @@ object JdbcTimelinesSuite extends JdbcIOSuiteWithCheckers {
     )).sampleWithSeed("JdbcTimelinesSuite")
 
     forall(gen) {
-      case TestCase(userName, allEvents, expectedEvents) =>
+      case TestCase(addressee, allEvents, expectedEvents) =>
         testResources.use { transactor =>
           val timelines = JdbcTimelines(transactor)
           for {
             _ <- allEvents.traverse_(timelines.save)
-            events <- timelines.readBy(NonEmptyList.of(userName))
+            events <- timelines.readBy(NonEmptyList.of(addressee))
           } yield expect(events == expectedEvents)
         }
     }

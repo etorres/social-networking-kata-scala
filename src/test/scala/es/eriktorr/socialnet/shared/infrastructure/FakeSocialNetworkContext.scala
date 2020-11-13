@@ -23,7 +23,7 @@ object FakeSocialNetworkContext {
     def initialStateFrom(
       initialTimeMark: TimeMark,
       messages: Messages,
-      subscriptions: UsersSubscriptions
+      subscriptions: FolloweesPerUser
     ): SocialNetworkState = {
       @tailrec
       def timelineEventsFrom(

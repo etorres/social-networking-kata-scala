@@ -7,6 +7,7 @@ import cats.effect._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 
 final case class TimelinesState(events: TimelineEvents)
@@ -17,8 +18,8 @@ object TimelinesState {
 
 final class FakeTimelines[F[_]: Sync] private[infrastructure] (val ref: Ref[F, TimelinesState])
     extends Timelines[F] {
-  override def readBy(userNames: NonEmptyList[UserName]): F[TimelineEvents] =
-    ref.get.map(_.events.filter(e => userNames.contains_(e.message.addressee)))
+  override def readBy(addressees: NonEmptyList[UserName[Addressee]]): F[TimelineEvents] =
+    ref.get.map(_.events.filter(e => addressees.contains_(e.message.addressee)))
 
   override def save(event: TimelineEvent): F[Unit] =
     ref.get.flatMap(current => ref.set(current.copy(event :: current.events)))

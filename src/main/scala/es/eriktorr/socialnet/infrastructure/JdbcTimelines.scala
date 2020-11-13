@@ -8,6 +8,7 @@ import doobie.implicits.javatime._
 import es.eriktorr.socialnet.domain.message._
 import es.eriktorr.socialnet.domain.time._
 import es.eriktorr.socialnet.domain.timeline._
+import es.eriktorr.socialnet.domain.user.UserName.UserType._
 import es.eriktorr.socialnet.domain.user._
 import es.eriktorr.socialnet.infrastructure.jdbc.NewTypeMapping
 
@@ -15,7 +16,7 @@ final class JdbcTimelines private (transactor: Transactor[IO])
     extends Timelines[IO]
     with NewTypeMapping {
   implicit val messageRead: Read[Message] =
-    Read[(UserName, UserName, MessageBody)].map {
+    Read[(UserName[Sender], UserName[Addressee], MessageBody)].map {
       case (sender, addressee, body) => Message(sender, addressee, body)
     }
 
@@ -24,7 +25,7 @@ final class JdbcTimelines private (transactor: Transactor[IO])
       case (timeMark, message) => TimelineEvent(timeMark, message)
     }
 
-  override def readBy(userNames: NonEmptyList[UserName]): IO[TimelineEvents] =
+  override def readBy(addressees: NonEmptyList[UserName[Addressee]]): IO[TimelineEvents] =
     for {
       events <- (fr"""
         SELECT
@@ -33,7 +34,7 @@ final class JdbcTimelines private (transactor: Transactor[IO])
           addressee,
           body
         FROM timeline_events
-        WHERE""" ++ Fragments.in(fr"addressee", userNames)
+        WHERE""" ++ Fragments.in(fr"addressee", addressees)
         ++ fr"ORDER BY received_at DESC LIMIT 100")
         .query[TimelineEvent]
         .to[List]
