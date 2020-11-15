@@ -43,8 +43,8 @@ object user {
         case Left(_) => InvalidParameter("User name cannot be blank or empty").asLeft
         case Right(refinedStr) => refinedStr.coerce[UserName[A]].asRight
       }
-  }
 
-  implicit def eqUserName[A <: UserName.UserType]: Eq[UserName[A]] = Eq.fromUniversalEquals
-  implicit def showUserName[A <: UserName.UserType]: Show[UserName[A]] = Show.show(_.toString)
+    implicit def eqUserName[A <: UserName.UserType]: Eq[UserName[A]] = Eq.fromUniversalEquals
+    implicit def showUserName[A <: UserName.UserType]: Show[UserName[A]] = Show.show(_.toString)
+  }
 }
